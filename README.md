@@ -8,7 +8,9 @@ with amaturity, as if handing in a school project at the last minute.  In an
 attempt to clean up code and make it easier to both read and modify, a new
 example has been written.
 
-This is not to say that it does not have issues on it's own, my example has
+This is not to say that it does not have issues on its own, my example has
 no input validation (a production no-no), and could use more documentation.
 
-[https://jnovack.github.io/mqtt-websocket/](https://jnovack.github.io/mqtt-websocket/)
+* [https://jnovack.github.io/mqtt-websocket/](https://jnovack.github.io/mqtt-websocket/)
+
+Within this repository, the example can be found in the `gh-pages` branch.
