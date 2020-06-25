@@ -1,0 +1,483 @@
+<html lang="en">
+<head>
+    <title>Checkout example for Bootstrap</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+
+    <!-- Custom styles for this template -->
+    <style>
+        .container {
+            max-width: 992px;
+        }
+
+        .border-top { border-top: 1px solid #e5e5e5; }
+        .border-bottom { border-bottom: 1px solid #e5e5e5; }
+        .border-top-gray { border-top-color: #adb5bd; }
+
+        .box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
+
+        .lh-condensed { line-height: 1.25; }
+
+        /* Bootstrap Overrides */
+        /* -- Place dots between inline-list-items */
+        ul li:after { content: " \00b7"; }
+        ul li:last-child:after { content: ""; }
+        .list-inline-item:not(:last-child) { margin-right: 0; }
+
+        /* -- Override certain badge transitions */
+        #feedback-publish, #feedback-subscribe, #feedback-subscriptions {
+            transition: none;
+        }
+
+        /* -- Special coloring for subscriptions/li */
+        #subscriptions li.list-group-item {
+            background: #6c757d
+        }
+
+        /* Placeholder Colors */
+        .form-control::-webkit-input-placeholder {
+            color: #999;
+        }
+        .form-control:-moz-placeholder {
+            color: #999;
+        }
+        .form-control::-moz-placeholder {
+            color: #999;
+        }
+        .form-control::placeholder {
+            color: #999;
+        }
+        .form-control:-ms-input-placeholder {
+            color: #999;
+        }
+    </style>
+</head>
+<body class="bg-dark text-light" id="trigger">
+    <div class="container">
+        <div class="row py-5">
+            <div class="col-md-2"></div>
+            <div class="col-md-2 d-flex justify-content-end">
+                <img class="d-inline mx-auto mb-4"
+                    src="https://raw.githubusercontent.com/mqtt/mqttorg-graphics/6e24cee95735f7bf04c1a11f7ebf246801f586a2/mqtticon.svg"
+                    alt="" width="72" height="72">
+            </div>
+            <div class="col-md-6 text-center">
+                <h2>MQTT over Websockets</h2>
+                <p class="lead">Connect to an MQTT server using Websockets.</p>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+        <div id="alert" class="d-none alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-4 order-md-2 mb-4">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="">Connection</i></span>
+                    <span class="badge badge-pill badge-disabled" id="connection-status"><i class="fas fa-wifi"></i></span>
+                </h4>
+                <ul class="list-group mb-3 text-dark">
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div class="row">
+                            <div class="col-md-12 mb-2 input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa fa-server"></i></span>
+                                </div>
+                                <input type="text" class="form-control" id="endpoint" placeholder="my.mqtt.local:8080"
+                                    required="">
+                                <div class="invalid-feedback" style="width: 100%;">
+                                    A valid host:port is required.
+                                </div>
+                            </div>
+                            <div class="col-md-12 custom-control custom-checkbox">
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="custom-control-input" id="use-ssl">
+                                    <label class="custom-control-label" for="use-ssl"><i class="fa fa-fw fa-lock"></i>Use SSL/TLS</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-2 input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa fa-user"></i></span>
+                                </div>
+                                <input type="text" class="form-control" id="username" placeholder="user24601" required="">
+                            </div>
+                            <div class="col-md-12 mb-2 input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa fa-key"></i></span>
+                                </div>
+                                <input type="password" class="form-control" id="password" placeholder="hunter2" required="">
+                            </div>
+                            <div class="col-md-12 mb-2 input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa fa-keyboard"></i></span>
+                                </div>
+                                <input type="text" class="form-control" id="clientid" placeholder="" required="">
+                            </div>
+                            <div class="col-md-12 custom-control custom-checkbox">
+                                <div class="form-group form-check">
+                                    <input type="checkbox" checked class="custom-control-input" id="clean-session">
+                                    <label class="custom-control-label" for="clean-session"><i class="fa fa-fw fa-hand-sparkles"></i>Clean Session</label>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <button class="btn btn-success btn-md btn-block" type="submit" id="connect">Connect</button>
+                        <button class="d-none btn btn-danger btn-md btn-block" type="submit" id="disconnect">Disconnect</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-8 order-md-1">
+                <h4 id="header-publish" class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="">Publish Message</i></span>
+                    <span class="badge badge-pill" id="feedback-publish"><i class="fas fa-comment-dots"></i></span>
+                </h4>
+                <div id="panel-publish">
+                    <form id="pub" class="needs-validation" novalidate="">
+                        <div class="row">
+                            <div class="col-md-8 mb-2">
+                                <label for="publish-topic">Topic</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">/</span>
+                                    </div>
+                                    <input type="text" class="form-control" id="publish-topic" placeholder="v1/app/demo/uptime" required="">
+                                    <div class="invalid-feedback" style="width: 100%;">
+                                        A topic is required.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label for="publish-qos">Quality of Service<span class="text-muted">&nbsp;(QOS)</span></label>
+                                <select class="custom-select d-block w-100" id="publish-qos">
+                                    <option value="0">0 - At most once</option>
+                                    <option value="1">1 - At least once</option>
+                                    <option value="2">2 - Exactly once</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label for="publish-message">Message</label>
+                            <input type="message" class="form-control" id="publish-message" placeholder="123" required="">
+                            <div class="invalid-feedback">
+                                A message is required.
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <input type="checkbox" class="" id="publish-retain">
+                            <label for="publish-retain">Retain Message</label>
+                        </div>
+
+                        <button class="btn btn-secondary btn-md btn-block" type="submit" id="publish" disabled>Publish</button>
+                    </form>
+                </div>
+
+                <hr class="mb-4" />
+
+                <h4 id="header-subscribe" class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="">Subscribe</span>
+                    <span class="badge badge-pill" id="feedback-subscribe"><i class="fas fa-comment"></i></span>
+                </h4>
+                <div id="panel-subscribe">
+                    <form id="sub" class="needs-validation" novalidate="">
+                        <div class="row">
+                            <div class="col-md-8 mb-2">
+                                <label for="subscribe-topic">Topic</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">/</span>
+                                    </div>
+                                    <input type="text" class="form-control" id="subscribe-topic" placeholder="v1/app/demo/uptime" required="">
+                                    <div id="subscribe-error" class="invalid-feedback" style="width: 100%;">An error has occured. Sorry, that's all I got. :(</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="subscribe-qos">Quality of Service<span class="text-muted">&nbsp;(QOS)</span></label>
+                                <select class="custom-select d-block w-100" id="subscribe-qos">
+                                    <option value="0">0 - At most once</option>
+                                    <option value="1">1 - At least once</option>
+                                    <option value="2">2 - Exactly once</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-md btn-block" type="submit" id="subscribe" disabled>Subscribe</button>
+                    </form>
+                </div>
+
+                <hr class="mb-4" />
+
+                <div class="mb-2">
+                    <h4 class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="">Subscriptions</span>
+                        <span class="badge badge-pill" id="feedback-subscriptions"><i class="fas fa-comments"></i></span>
+                    </h4>
+                    <ul class="list-group mb-3s" id="subscriptions">
+                    </ul>
+                </div>
+                <button class="btn btn-info btn-md btn-block" type="submit" id="clear">Clear Messages</button>
+
+            </div>
+        </div>
+
+        <footer class="my-5 pt-5 text-muted text-center text-small">
+            <p class="mb-1">© 2020 <a href="https://github.com/jnovack">@jnovack</a></p>
+            <ul class="list-inline">
+                <li class="list-inline-item"><a href="https://www.eclipse.org/paho/files/jsdoc/index.html">MQTT Javascript Library</a></li>
+                <li class="list-inline-item"><a href="https://getbootstrap.com/">Bootstrap</a></li>
+                <li class="list-inline-item"><a href="https://fontawesome.com/">FontAwesome</a></li>
+            </ul>
+        </footer>
+    </div>
+
+    <!-- JavaScript
+         ==================================================
+         Placed at the end of the document so the pages load faster
+         -->
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <!-- JQuery UI -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <!-- Bootstrap -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+
+    <!-- Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/js/all.min.js"></script>
+
+    <!-- MQTT Websockets Library -->
+    <!--   Documentation: https://www.eclipse.org/paho/files/jsdoc/Paho.MQTT.Client.html -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+
+    <!-- Additional Display Libraries -->
+    <!-- <script src="https://unpkg.com/@popperjs/core@2"></script> -->
+
+    <script>
+        // Bootstrap form submission prevention
+        //   We want to use forms for display and function, NOT for submission.
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            return false;
+                        }
+                        event.preventDefault();
+                        event.stopPropagation();
+                        }, false);
+                });
+            }, false);
+        })();
+    </script>
+    <script>
+        // Helper functions
+
+        /**
+        * @return {string}
+        */
+        function makeid(length) {
+            var result = '';
+            var characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for (var i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        }
+        $("#clientid").attr("placeholder", makeid(8));
+
+        /**
+        * @see http://stackoverflow.com/q/7616461/940217
+        * @return {number}
+        */
+        String.prototype.hashCode = function () {
+            if (Array.prototype.reduce) {
+                return this.split("").reduce(function (a, b) { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+            }
+            var hash = 0;
+            if (this.length === 0) return hash;
+            for (var i = 0; i < this.length; i++) {
+                var character = this.charCodeAt(i);
+                hash = ((hash << 5) - hash) + character;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash;
+        }
+    </script>
+    <script>
+        // Initialization fuctions
+
+        $('#connect').click(function () {
+            $('#connect').removeClass('btn-success').addClass('btn-disabled');
+            Connect();
+            return false;
+        });
+        $('#disconnect').click(function () {
+            Disconnect();
+            return false;
+        });
+        $('#publish').click(function () {
+            Publish()
+            return false;
+        });
+        $('#subscribe').click(function () {
+            Subscribe();
+            return false;
+        });
+        $('#header-publish').on('click', function() {
+            $('#panel-publish').slideToggle();
+        })
+        $('#header-subscribe').on('click', function() {
+            $('#panel-subscribe').slideToggle();
+        })
+        $('#clear').click(function () {
+            $('#subscriptions').empty();
+        });
+    </script>
+    <script>
+        // "Public" functions //
+
+        // Connect button press
+        function Connect() {
+            var cleanSession = $('#clean-session').prop("checked");
+            var useSSL = $('#use-ssl').prop("checked");
+            var endpoint = $('#endpoint').val();
+            var username = $('#username').val();
+            var password = $('#password').val();
+            var clientid = $('#clientid').val() ? $('#clientid').val() : $('#clientid').prop('placeholder');
+
+            uri = endpoint.split(/:/g);
+            console.log("connecting to " + uri[0] + ":" + parseInt(uri[1]) + " using a " + (cleanSession ? "clean" : "persistant") + " session " + (username ? "with" : "without") + " authentication as " + clientid);
+
+            $('#connection-status').removeClass('badge-disabled badge-success badge-danger badge-warning badge-primary badge-info badge-dark').addClass('badge-info');
+            mqtt = new Paho.MQTT.Client(uri[0], parseInt(uri[1]), clientid);
+            var options = {
+                useSSL: useSSL,
+                timeout: 3,
+                cleanSession: cleanSession,
+                onSuccess: onConnectionSuccess,
+                onFailure: onConnectionFailure,
+
+            };
+            if (username != "")
+                options.userName = username;
+            if (password != "")
+                options.password = password;
+
+            mqtt.onConnectionLost = onConnectionLost;
+            mqtt.onMessageArrived = onMessageArrived;
+            mqtt.onMessageDelivered = onMessageSuccess;
+
+            mqtt.connect(options);
+        }
+
+        // Disconnect button press
+        function Disconnect() {
+            mqtt.disconnect();
+        }
+
+        // Publish button press
+        function Publish() {
+            message = new Paho.MQTT.Message($('#publish-message').val());
+			message.destinationName = $('#publish-topic').val();
+            message.qos = parseInt($('#publish-qos').val());
+            message.retained = $('#publish-retain').is(':checked');
+            mqtt.send(message);
+        }
+
+        // Subscribe button press
+        function Subscribe() {
+            mqtt.subscribe($('#subscribe-topic').val(), { qos: parseInt($('#subscribe-qos').val()), onSuccess: onSubscribeSuccess, onFailure: onSubscribeFailure });
+        }
+    </script>
+    <script>
+        // "Private" functions
+
+        function onMessageSuccess(obj) {
+            $("#feedback-publish").effect("highlight", {color: '#28a745'}, 3000);
+            // $('#publish-message').addClass('is-valid');
+        }
+        function onSubscribeSuccess(obj) {
+            $("#feedback-subscribe").effect("highlight", {color: '#28a745'}, 3000);
+            // $('#subscribe-topic').addClass('is-valid');
+        }
+        function onSubscribeFailure(obj) {
+            $('#subscribe-topic').addClass('is-invalid');
+            $('#subscribe-error').html(obj.errorMessage);
+        }
+        function onConnectionSuccess(obj) {
+            $('#connect').addClass('d-none');
+            $('#disconnect').removeClass('d-none');
+            $('#endpoint').attr('disabled', true);
+            $('#use-ssl').attr('disabled', true);
+            $('#username').attr('disabled', true);
+            $('#password').attr('disabled', true);
+            $('#clientid').attr('disabled', true);
+            $('#clean-session').attr('disabled', true);
+            $('#connect').removeClass('btn-disabled').addClass('btn-success');
+            $('#publish').attr('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
+            $('#subscribe').attr('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
+            $('#connection-status').removeClass('badge-disabled badge-success badge-danger badge-warning badge-primary badge-info badge-dark').addClass('badge-success');
+
+            mqtt.subscribe('test', { qos: 0 });
+        }
+        function onConnectionFailure(obj) {
+            onConnectionLost(obj);
+        }
+        function onConnectionLost(obj) {
+            if (obj.errorCode == 0) {
+                $('#connection-status').removeClass('badge-disabled badge-success badge-danger badge-warning badge-primary badge-info badge-dark').addClass('badge-disabled');
+            } else {
+                $('#connection-status').removeClass('badge-disabled badge-success badge-danger badge-warning badge-primary badge-info badge-dark').addClass('badge-danger');
+            }
+            $('#disconnect').addClass('d-none');
+            $('#connect').removeClass('d-none');
+            $('#endpoint').attr('disabled', false);
+            $('#use-ssl').attr('disabled', false);
+            $('#username').attr('disabled', false);
+            $('#password').attr('disabled', false);
+            $('#clientid').attr('disabled', false);
+            $('#clean-session').attr('disabled', false);
+            $('#publish').attr('disabled', true).removeClass('btn-primary').addClass('btn-secondary');
+            $('#subscribe').attr('disabled', true).removeClass('btn-primary').addClass('btn-secondary');
+        }
+        function onMessageArrived(obj) {
+            $("#feedback-subscriptions").stop().css("background-color", "");  // Multiple messages could come in, reset element if still animating
+            $("#feedback-subscriptions").effect("highlight", {color: '#28a745'}, 3000);
+            if ($('#topic-' + obj.destinationName.hashCode()).length) {
+                // Update
+                $('#topic-' + obj.destinationName.hashCode()).effect("highlight");
+                $('#message-' + obj.destinationName.hashCode()).html(obj.payloadString);
+            } else {
+                // Add
+                $('#subscriptions').append("<li id='topic-" + obj.destinationName.hashCode() +
+                    "' class='list-group-item justify-content-between lh-condensed'><div class='row text-light'><div class='col-md-9'>" +
+                    obj.destinationName +
+                    "</div><div class='col-md-3' id='message-" +
+                    obj.destinationName.hashCode() +
+                    "'>" +
+                    obj.payloadString +
+                    "</div></div></li>"
+                )
+            }
+        }
+    </script>
+</body>
+</html>
